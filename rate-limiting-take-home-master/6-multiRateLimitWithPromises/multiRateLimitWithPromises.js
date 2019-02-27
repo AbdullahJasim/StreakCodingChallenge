@@ -33,19 +33,25 @@ export default function multiRateLimitWithPromises(fn, time, numInWindow) {
   let calls = [];
   let numCalled = 0;
 
-  return () => {
-    //if (numCalled >= numInWindow)...
+  let goThroughQueue = () => {
+    if (calls.length <= 0 || numCalled >= numInWindow) return;
 
     numCalled++;
-    fn.bind(this, ...arguments);
-    let p = new Promise((resolve, reject) => {
-    resolve(fn());
 
+    return new Promise(resolve => {
+      let r = calls.shift().call();
+        resolve(r);
+      }).then(() => {
       setTimeout(() => {
-        let numCalled = 0;--;
+        numCalled--;
+        goThroughQueue();
       }, time);
     });
+  }
 
-    return p;
+
+  return (...args) => {
+    calls.push(fn.bind(this, ...args));
+    return goThroughQueue();
   }
 }
