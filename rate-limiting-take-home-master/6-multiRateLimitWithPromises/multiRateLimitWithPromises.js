@@ -40,15 +40,14 @@ export default function multiRateLimitWithPromises(fn, time, numInWindow) {
 
     return new Promise(resolve => {
       let r = calls.shift().call();
-        resolve(r);
-      }).then(() => {
+      resolve(r);
+    }).then(() => {
       setTimeout(() => {
         numCalled--;
         goThroughQueue();
       }, time);
     });
   }
-
 
   return (...args) => {
     calls.push(fn.bind(this, ...args));

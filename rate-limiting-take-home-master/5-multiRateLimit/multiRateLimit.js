@@ -23,7 +23,7 @@ export default function multiRateLimit(fn, time, numInWindow) {
         numCalled++;
       }
 
-      setTimeout(() => {numCalled--; caller();}, time);
+      setTimeout(() => {numCalled--; goThroughQueue();}, time);
   };
 
   return () => {
